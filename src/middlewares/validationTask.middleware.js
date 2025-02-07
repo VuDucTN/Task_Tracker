@@ -1,13 +1,5 @@
-const { body, query, param, validationResult } = require("express-validator");
-
-const validate = (req, res, next) => {
-  const error = validationResult(req);
-  if (!error.isEmpty()) {
-    return res.status(404).json({ error: error.array() });
-  }
-
-  next();
-};
+const { body, query, param } = require("express-validator");
+const validate = require("./validate");
 
 const validateCreateTask = [
   body("description").notEmpty().withMessage("Description is required!"),

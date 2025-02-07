@@ -9,7 +9,7 @@ connectDB();
 
 app.use(express.json());
 
-app.use("/task", routes);
+app.use("/api", routes);
 
 app.use((err, req, res, next) => {
   console.error("🚨 Server Error:", err);

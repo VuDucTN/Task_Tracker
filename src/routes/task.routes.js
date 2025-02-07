@@ -6,7 +6,7 @@ const {
   validateGetTask,
   validateUpdateTask,
   validateUpdateTaskStatus,
-} = require("../middlewares/validation.middleware");
+} = require("../middlewares/validationTask.middleware");
 
 const {
   getTask,
