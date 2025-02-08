@@ -4,8 +4,11 @@ const getTask = async (req, res) => {
   try {
     const { status } = req.query;
 
-    const filter = status ? { status } : {};
-    const tasks = await Task.find(filter);
+    const filter = { createdBy: req.user.userId };
+    if (status) {
+      filter.status = status;
+    }
+    const tasks = await Task.find(filter).populate("createdBy", "username");
     res.json(tasks);
   } catch (error) {
     res.status(500).json({ error: "Server error" });
@@ -20,7 +23,10 @@ const createTask = async (req, res) => {
       return res.status(400).json({ error: "Description is required!" });
     }
 
-    const newTask = await Task.create({ description });
+    const newTask = await Task.create({
+      description,
+      createdBy: req.user.userId,
+    });
     res.status(201).json(newTask);
   } catch (error) {
     res.status(500).json({ error: "Server error" });
@@ -32,8 +38,8 @@ const updateTask = async (req, res) => {
     const { id } = req.params;
     const { description } = req.body;
 
-    const updateTask = await Task.findByIdAndUpdate(
-      id,
+    const updateTask = await Task.findOneAndUpdate(
+      { _id: id, createdBy: req.user.userId },
       {
         description,
         updatedAt: new Date(),
@@ -42,7 +48,9 @@ const updateTask = async (req, res) => {
     );
 
     if (!updateTask) {
-      return res.status(404).json({ error: "Task not found!" });
+      return res
+        .status(404)
+        .json({ error: "Task not found or you don't have permission!" });
     }
 
     res.json(updateTask);
@@ -55,11 +63,17 @@ const deleteTask = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const delateTask = await Task.findByIdAndDelete(id);
+    const task = await Task.findOneAndDelete({
+      _id: id,
+      createdBy: req.user.userId,
+    });
 
-    if (!delateTask) {
-      return res.status(404).json({ error: "Task not found!" });
+    if (!task) {
+      return res
+        .status(403)
+        .json({ error: "Task not found or you don't have permission!" });
     }
+
     res.json({ message: `Task ${id} deleted!` });
   } catch (error) {
     res.status(500).json({ error: "Server error" });
