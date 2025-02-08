@@ -16,16 +16,23 @@ const {
   updateTaskStatus,
 } = require("../controllers/task.controller");
 
+const { authenticate } = require("../middlewares/validationUser.middleware");
+
 const router = express.Router();
 
-router.post("/", validateCreateTask, createTask);
+router.post("/", validateCreateTask, authenticate, createTask);
 
-router.put("/:id", validateUpdateTask, updateTask);
+router.put("/:id", validateUpdateTask, authenticate, updateTask);
 
-router.delete("/:id", validateDeleteTask, deleteTask);
+router.delete("/:id", validateDeleteTask, authenticate, deleteTask);
 
-router.patch("/status", validateUpdateTaskStatus, updateTaskStatus);
+router.patch(
+  "/status",
+  validateUpdateTaskStatus,
+  authenticate,
+  updateTaskStatus
+);
 
-router.get("/", validateGetTask, getTask);
+router.get("/", validateGetTask, authenticate, getTask);
 
 module.exports = router;
