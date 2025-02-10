@@ -19,10 +19,6 @@ const createTask = async (req, res) => {
   try {
     const { description } = req.body;
 
-    if (!description) {
-      return res.status(400).json({ error: "Description is required!" });
-    }
-
     const newTask = await Task.create({
       description,
       createdBy: req.user.userId,

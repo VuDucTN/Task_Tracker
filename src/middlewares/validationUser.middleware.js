@@ -17,8 +17,7 @@ const validateLogin = [
 ];
 
 const authenticate = (req, res, next) => {
-  const authHeader = req.header("Authorization");
-  const token = authHeader && authHeader.split(" ")[1];
+  const token = req.cookies.token;
 
   if (!token) {
     return res.status(401).json({ error: "Access denied! No token provided." });

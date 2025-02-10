@@ -35,13 +35,30 @@ const login = async (req, res) => {
       return res.status(400).json({ error: "Invalid username!" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ error: "Password is wrong!" });
     }
 
     const token = generate(user);
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
     res.json({ message: "Login successful!", token });
+  } catch (error) {
+    res.status(500).json({ error: "Server error!" });
+  }
+};
+
+const logout = (req, res) => {
+  try {
+    res.clearCookie("token");
+    res.json({ message: "Logout successful!" });
   } catch (error) {
     res.status(500).json({ error: "Server error!" });
   }
@@ -56,4 +73,4 @@ const getUser = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getUser };
+module.exports = { register, login, logout, getUser };
